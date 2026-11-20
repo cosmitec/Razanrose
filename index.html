@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ِ<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -909,16 +909,16 @@
         }
         /* ===== تصنيفات أكبر وحركة سلسة ===== */
         body #categories-container {
-            gap: 18px !important;
-            padding: 6px 4px 16px !important;
+            gap: 15px !important;
+            padding: 6px 4px 14px !important;
             scroll-behavior: smooth;
             scroll-snap-type: x proximity;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior-x: contain;
         }
         body #categories-container .cat-btn {
-            min-width: 112px !important; max-width: 128px !important;
-            gap: 10px !important; scroll-snap-align: center;
+            min-width: 98px !important; max-width: 112px !important;
+            gap: 8px !important; scroll-snap-align: center;
             opacity: .85;
             transition: transform .4s cubic-bezier(.22,.9,.3,1), opacity .3s ease;
             animation: cat-in .55s cubic-bezier(.22,.9,.3,1) both;
@@ -934,20 +934,20 @@
         body #categories-container .cat-btn:active { transform: scale(.95); }
         body #categories-container .cat-btn.active { opacity: 1; transform: scale(1.07); animation: none; }
         body #categories-container .cat-thumb {
-            width: 100px !important; height: 100px !important; border-radius: 26px !important;
+            width: 86px !important; height: 86px !important; border-radius: 23px !important;
             transition: box-shadow .4s ease, border-color .3s ease, transform .4s cubic-bezier(.22,.9,.3,1);
         }
         body #categories-container .cat-thumb img { transition: transform .5s cubic-bezier(.22,.9,.3,1); }
         body #categories-container .cat-btn:hover .cat-thumb img { transform: scale(1.08); }
         body #categories-container .cat-label {
-            font-size: 14px !important; line-height: 1.5 !important; font-weight: 800 !important;
+            font-size: 13px !important; line-height: 1.5 !important; font-weight: 800 !important;
             transition: color .3s ease;
         }
         @media (max-width: 640px) {
-            body #categories-container { gap: 14px !important; }
-            body #categories-container .cat-btn { min-width: 92px !important; max-width: 104px !important; }
-            body #categories-container .cat-thumb { width: 82px !important; height: 82px !important; border-radius: 22px !important; }
-            body #categories-container .cat-label { font-size: 12.5px !important; }
+            body #categories-container { gap: 12px !important; }
+            body #categories-container .cat-btn { min-width: 80px !important; max-width: 92px !important; }
+            body #categories-container .cat-thumb { width: 70px !important; height: 70px !important; border-radius: 19px !important; }
+            body #categories-container .cat-label { font-size: 11.5px !important; }
         }
         @media (prefers-reduced-motion: reduce) {
             body #categories-container { scroll-behavior: auto; }
@@ -1282,6 +1282,45 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
         @media (prefers-reduced-motion: reduce) {
             .pk-sway, .pk-sway-2, .pk-float, .pk-spin { animation: none !important; }
             #pk-petals { display: none !important; }
+        }
+
+        /* ===== التصنيفات الفرعية: خلفية وردية + حركة سلسة مثل الأساسية ===== */
+        body #subcats-container {
+            background: linear-gradient(135deg, #f08fb5, #d94f85) !important;
+            background-color: #e8709f !important;
+            border-color: transparent !important;
+            box-shadow: 0 8px 18px -8px rgba(214, 69, 133, .55) !important;
+            scroll-behavior: smooth;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+        }
+        body #subcats-wrap { transition: grid-template-rows .45s cubic-bezier(.22,.9,.3,1) !important; }
+        body #subcats-container .sub-btn {
+            color: #fff !important;
+            background: transparent !important;
+            scroll-snap-align: center;
+            opacity: .9;
+            transition: transform .4s cubic-bezier(.22,.9,.3,1), opacity .3s ease, background-color .3s ease, color .3s ease, box-shadow .4s ease !important;
+            animation: sub-in .55s cubic-bezier(.22,.9,.3,1) backwards;
+            will-change: transform;
+        }
+        body #subcats-container .sub-btn:nth-child(2) { animation-delay: .05s; }
+        body #subcats-container .sub-btn:nth-child(3) { animation-delay: .10s; }
+        body #subcats-container .sub-btn:nth-child(4) { animation-delay: .15s; }
+        body #subcats-container .sub-btn:nth-child(5) { animation-delay: .20s; }
+        body #subcats-container .sub-btn:nth-child(n+6) { animation-delay: .25s; }
+        @keyframes sub-in { from { opacity: 0; transform: translateY(10px) scale(.92); } to { opacity: .9; transform: none; } }
+        body #subcats-container .sub-btn:hover { opacity: 1; transform: translateY(-2px); background: rgba(255,255,255,.22) !important; }
+        body #subcats-container .sub-btn:active { transform: scale(.95); }
+        body #subcats-container .sub-btn.active {
+            opacity: 1; transform: scale(1.05);
+            background: #fff !important; color: #c93d78 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,.16) !important;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            body #subcats-container { scroll-behavior: auto; }
+            body #subcats-container .sub-btn { animation: none; transition: none !important; }
         }
     </style>
 
@@ -2601,6 +2640,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
             if (!b) return;
             currentSubcategory = b.dataset.sub;
             $('subcats-container').querySelectorAll('.sub-btn').forEach((x) => x.classList.toggle('active', x.dataset.sub === currentSubcategory));
+            try { b.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); } catch (err) {}
             renderProducts();
         });
         $('products-grid').addEventListener('click', (e) => {
