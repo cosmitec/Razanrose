@@ -2046,7 +2046,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
         const CLOUDINARY_CLOUD_NAME = "hgu0bcir";
         // معرّف API للحساب؛ الرفع الحالي غير الموقّع يعتمد على Upload Preset ولا يستخدم المفتاح مباشرةً.
         const CLOUDINARY_API_KEY = "137565258244329";
-        const CLOUDINARY_UPLOAD_PRESET = "aliiiw";
+        const CLOUDINARY_UPLOAD_PRESET = "alii123fv";
         const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
  
         const $ = (id) => document.getElementById(id);
@@ -3162,7 +3162,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                     : err.message === 'image-too-large' ? 'حجم الصورة كبير جداً. الحد الأقصى 10MB.'
                     : err.message === 'invalid-image' ? 'الملف المختار ليس صورة صالحة.'
                     : err.message === 'upload-timeout' ? 'انتهت مهلة رفع الصورة. تحققي من الإنترنت ثم أعيدي المحاولة.'
-                    : `تعذر رفع الصورة إلى Cloudinary: ${err.message || 'تحققي من الاتصال وإعدادات Upload Preset aliiiw.'}`;
+                    : `تعذر رفع الصورة إلى Cloudinary: ${err.message || 'تحققي من الاتصال وإعدادات Upload Preset alii123fv.'}`;
                 showCustomAlert('خطأ في رفع الصورة', msg, true);
             } finally {
                 uploadingSlots[idx] = false;
@@ -3353,7 +3353,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
 
             const formData = new FormData();
             const safeFolder = String(folder || 'uploads').replace(/[^a-zA-Z0-9_-]/g, '-');
-            const uploadFileName = `aliiiw-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+            const uploadFileName = `alii123fv-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
             formData.append('file', blob, uploadFileName);
             formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
             formData.append('folder', `athar/${safeFolder}`);
@@ -3422,7 +3422,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                 preview.src = '';
                 preview.classList.add('hidden');
                 status.textContent = 'تعذر رفع الصورة.';
-                showCustomAlert('خطأ في رفع الصورة', 'تعذر رفع صورة التصنيف إلى Cloudinary. تأكدي من أن Upload Preset باسم aliiiw مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
+                showCustomAlert('خطأ في رفع الصورة', 'تعذر رفع صورة التصنيف إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
             } finally {
                 URL.revokeObjectURL(localPreview);
                 imageUploadBusy = false;
@@ -3451,7 +3451,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                 preview.src = '';
                 preview.classList.add('hidden');
                 status.textContent = 'تعذر رفع الشعار.';
-                showCustomAlert('خطأ في رفع الشعار', 'تعذر رفع الشعار إلى Cloudinary. تأكدي من أن Upload Preset باسم aliiiw مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
+                showCustomAlert('خطأ في رفع الشعار', 'تعذر رفع الشعار إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
             } finally {
                 URL.revokeObjectURL(localPreview);
                 imageUploadBusy = false;
@@ -3828,7 +3828,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                 console.error('Cloudinary slider upload failed:', err);
                 refreshSliderAdminUI();
                 st.textContent = 'تعذر رفع الصورة.';
-                showCustomAlert('خطأ في رفع الصورة', 'تعذر رفع الصورة إلى Cloudinary. تأكدي من أن Upload Preset باسم aliiiw مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
+                showCustomAlert('خطأ في رفع الصورة', 'تعذر رفع الصورة إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
             } finally {
                 URL.revokeObjectURL(localPreview);
                 e.target.value = '';
