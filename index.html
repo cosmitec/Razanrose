@@ -3422,7 +3422,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                 preview.src = '';
                 preview.classList.add('hidden');
                 status.textContent = 'تعذر رفع الصورة.';
-                showCustomAlert('خطأ في رفع الصورة', 'تعذر رفع صورة التصنيف إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
+                showCustomAlert('خطأ في رفع الصورة', 'تعذر رفع صورة التصنيف إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.' + (err && err.message ? ' (رسالة Cloudinary: ' + err.message + ')' : ''), true);
             } finally {
                 URL.revokeObjectURL(localPreview);
                 imageUploadBusy = false;
@@ -3451,7 +3451,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                 preview.src = '';
                 preview.classList.add('hidden');
                 status.textContent = 'تعذر رفع الشعار.';
-                showCustomAlert('خطأ في رفع الشعار', 'تعذر رفع الشعار إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
+                showCustomAlert('خطأ في رفع الشعار', 'تعذر رفع الشعار إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.' + (err && err.message ? ' (رسالة Cloudinary: ' + err.message + ')' : ''), true);
             } finally {
                 URL.revokeObjectURL(localPreview);
                 imageUploadBusy = false;
@@ -3828,7 +3828,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                 console.error('Cloudinary slider upload failed:', err);
                 refreshSliderAdminUI();
                 st.textContent = 'تعذر رفع الصورة.';
-                showCustomAlert('خطأ في رفع الصورة', 'تعذر رفع الصورة إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.', true);
+                showCustomAlert('خطأ في رفع الصورة', 'تعذر رفع الصورة إلى Cloudinary. تأكدي من أن Upload Preset باسم alii123fv مضبوط على Unsigned، ثم أعيدي المحاولة.' + (err && err.message ? ' (رسالة Cloudinary: ' + err.message + ')' : ''), true);
             } finally {
                 URL.revokeObjectURL(localPreview);
                 e.target.value = '';
