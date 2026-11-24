@@ -421,7 +421,7 @@
         #welcome{background:linear-gradient(145deg,#ffffff,#fffaf4)!important}
         #welcome .w-tile{background:linear-gradient(145deg,#fff6ed,#f8e7d8)!important;box-shadow:0 18px 36px -10px rgba(198,138,83,.27)!important}
         #welcome .w-tile svg{animation:none!important}
-        #welcome .makeup-brush-icon{animation:brush-sway 2.1s ease-in-out infinite!important;transform-origin:50% 52%;filter:drop-shadow(0 5px 4px rgba(198,138,83,.22))}
+        #welcome .pumpkin-icon{animation:brush-sway 2.1s ease-in-out infinite!important;transform-origin:50% 52%;filter:drop-shadow(0 5px 4px rgba(198,138,83,.22))}
         @keyframes brush-sway{0%,100%{transform:rotate(-9deg) translateY(0)}50%{transform:rotate(9deg) translateY(-3px)}}
         #welcome h2{color:var(--hl-teal-deep)!important}
         #welcome .w-bar{background:#f9eadc!important}
@@ -492,7 +492,7 @@
             .highlight-dots{bottom:11px}
         }
         @media(prefers-reduced-motion:reduce){
-            #welcome .makeup-brush-icon{animation:none!important}
+            #welcome .pumpkin-icon{animation:none!important}
             .highlight-slide,.highlight-dot,.highlight-arrow{transition:none!important}
         }
 
@@ -996,7 +996,7 @@
             box-shadow: 0 3px 10px rgba(0,0,0,.14) !important;
         }
         /* ===== برتقالي متناسق مع الفيروزي: الفرشاة، عبارة الشعار، شريط التصنيفات الفرعية ===== */
-        #welcome .makeup-brush-icon { filter: drop-shadow(0 5px 4px rgba(226,171,110,.3)) !important; }
+        #welcome .pumpkin-icon { filter: drop-shadow(0 5px 4px rgba(226,171,110,.3)) !important; }
         #welcome .w-tile { background: linear-gradient(145deg, #fff8f0, #ffedd9) !important; box-shadow: 0 18px 36px -10px rgba(226,171,110,.32) !important; }
         body header p.text-blue-700, body header p.font-semibold, body #store-logo-container p, body #store-brand-copy p { color: #e0ad70 !important; }
         body #subcats-container {
@@ -1369,10 +1369,6 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
         .hero .hero-categories span {color:#e66812 !important}
         #main-search-input:focus {border-color:#e66812 !important;box-shadow:0 0 0 4px rgba(230,104,18,.18) !important}
     </style>
-    <style id="orange-category-artwork">
-        /* تطبيع صور أيقونات التصنيفات ذات الخلفيات الوردية؛ تبقى صور المنتجات والترويج كما هي. */
-        body #categories-container .cat-thumb img { filter: hue-rotate(55deg) saturate(.92); }
-    </style>
 
     <style id="razan-rose-cart-black-text">
         /* صفحة سلة المشتريات: النصوص باللون الأسود مع الحفاظ على زر واتساب الأخضر */
@@ -1440,6 +1436,59 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
         }
     </style>
 
+    <style id="halloween-welcome-and-clean-categories">
+        /* شاشة التحميل: نص أسود، بدون شريط تحميل */
+        body #welcome h2,
+        body #welcome h2 span,
+        body #welcome h2 * {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+        }
+        /* تصغير اسم المتجر في شاشة الترحيب فقط */
+        body #welcome h2 span {
+            font-size: .78em !important;
+            line-height: 1.4 !important;
+        }
+        /* إعادة إظهار شريط التحميل البرتقالي المتحرك في شاشة الترحيب */
+        body #welcome .w-bar {
+            display: block !important;
+            width: 330px !important;
+            max-width: 70vw !important;
+            height: 8px !important;
+            border-radius: 9999px !important;
+            overflow: hidden !important;
+            background: #ffd0a3 !important;
+        }
+        body #welcome .w-bar i {
+            display: block !important;
+            height: 100% !important;
+            border-radius: 9999px !important;
+            background: linear-gradient(90deg, #f9a14d, #e66812) !important;
+            animation: w-fill 4s linear forwards !important;
+        }
+        body #welcome .pumpkin-icon { filter: drop-shadow(0 5px 4px rgba(194,65,12,.28)) !important; }
+
+        /* التصنيفات: بدون أي طبقة أو فلتر لوني فوق الصور */
+        body #categories-container .cat-thumb img { filter: none !important; }
+        body #categories-container .cat-thumb::before,
+        body #categories-container .cat-thumb::after { content: none !important; }
+
+        /* فئة «الكل» بدون أيقونة: زر نصي فقط */
+        body #categories-container .cat-btn.cat-all-btn {
+            min-width: 0 !important; max-width: none !important; width: auto !important;
+            align-self: flex-start; margin-top: 24px;
+            padding: 8px 20px; border-radius: 9999px;
+            background: #fff; border: 2px solid var(--hl-line, #f5dec9);
+            box-shadow: 0 6px 14px -8px rgba(198,138,83,.25);
+            gap: 0 !important;
+        }
+        body #categories-container .cat-btn.cat-all-btn .cat-label { font-size: 13px !important; white-space: nowrap; padding: 0 !important; }
+        body #categories-container .cat-btn.cat-all-btn.active { border-color: #c48645; background: #fff8f0; }
+        @media (max-width: 640px) {
+            body #categories-container .cat-btn.cat-all-btn { margin-top: 16px; padding: 7px 16px; }
+            body #categories-container .cat-btn.cat-all-btn .cat-label { font-size: 12px !important; }
+        }
+    </style>
 </head>
 <body class="min-h-screen flex flex-col bg-[#f8faff]">
     <svg class="pk-defs" aria-hidden="true" focusable="false"><defs>
@@ -1469,29 +1518,27 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
 
     <div id="welcome" role="dialog" aria-label="ترحيب">
         <div class="w-tile">
-            <svg class="makeup-brush-icon" viewBox="0 0 64 64" aria-hidden="true">
+            <svg class="pumpkin-icon" viewBox="0 0 64 64" aria-hidden="true">
                 <defs>
-                    <linearGradient id="brushHandle" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#f5d4b1"/><stop offset=".48" stop-color="#dca56b"/><stop offset="1" stop-color="#a97036"/>
-                    </linearGradient>
-                    <linearGradient id="brushMetal" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0" stop-color="#ffeed9"/><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#f2cb9b"/>
-                    </linearGradient>
-                    <linearGradient id="brushBristles" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#f8ffff"/><stop offset=".55" stop-color="#ffead0"/><stop offset="1" stop-color="#eebd86"/>
-                    </linearGradient>
+                    <radialGradient id="pumpkinBody" cx="50%" cy="38%" r="70%">
+                        <stop offset="0" stop-color="#ffb84d"/><stop offset=".55" stop-color="#f97316"/><stop offset="1" stop-color="#c2410c"/>
+                    </radialGradient>
                 </defs>
-                <g transform="rotate(31 32 32)" stroke-linejoin="round" stroke-linecap="round">
-                    <path d="M27 29 L34 29 L37 58 Q37 61 34 61 L27 61 Q24 61 24 58 Z" fill="url(#brushHandle)" stroke="#a97036" stroke-width="1.4"/>
-                    <path d="M25 26 L36 26 L36 34 L25 34 Z" fill="url(#brushMetal)" stroke="#e5b98a" stroke-width="1.2"/>
-                    <path d="M24 27 C22 20 20 13 24 6 C27 1 35 1 39 6 C43 12 39 21 37 27 Z" fill="url(#brushBristles)" stroke="#e5b47d" stroke-width="1.4"/>
-                    <path d="M25 24 C25 17 26 10 29 5 M30 25 C30 16 31 9 32 4 M35 25 C37 17 37 11 36 6" fill="none" stroke="#ffffff" stroke-opacity=".8" stroke-width="1.1"/>
-                    <path d="M27 39 L34 39" stroke="#fff2e3" stroke-opacity=".8" stroke-width="1.2"/>
+                <g stroke-linejoin="round" stroke-linecap="round">
+                    <path d="M29 18 C28 11 31 8 37 5.5 L39.5 9.5 C35.5 11 34.5 13.5 35.5 18 Z" fill="#6b4423" stroke="#4a2c14" stroke-width="1.2"/>
+                    <ellipse cx="18.5" cy="37" rx="13.5" ry="19" fill="url(#pumpkinBody)" stroke="#9a3412" stroke-width="1.6"/>
+                    <ellipse cx="45.5" cy="37" rx="13.5" ry="19" fill="url(#pumpkinBody)" stroke="#9a3412" stroke-width="1.6"/>
+                    <ellipse cx="32" cy="37" rx="12.5" ry="20" fill="url(#pumpkinBody)" stroke="#9a3412" stroke-width="1.6"/>
+                    <path d="M25.5 19 C21 31 21 44 25.5 55 M38.5 19 C43 31 43 44 38.5 55" fill="none" stroke="#c2410c" stroke-opacity=".45" stroke-width="1.3"/>
+                    <path d="M19 34 L24 25 L29 34 Z" fill="#ffd43b" stroke="#7c2d12" stroke-width="1.2"/>
+                    <path d="M35 34 L40 25 L45 34 Z" fill="#ffd43b" stroke="#7c2d12" stroke-width="1.2"/>
+                    <path d="M30 39 L32 35.5 L34 39 Z" fill="#ffd43b" stroke="#7c2d12" stroke-width="1"/>
+                    <path d="M15.5 42 Q32 63 48.5 42 Q32 48.5 15.5 42 Z" fill="#ffd43b" stroke="#7c2d12" stroke-width="1.3"/>
+                    <path d="M24 47 L24 50.2 M29 49 L29 52.4 M35 49 L35 52.4 M40 47 L40 50.2" fill="none" stroke="#7c2d12" stroke-width="1.2"/>
                 </g>
             </svg>
         </div>
-        <h2>نورتو <span>رزان روز by ismael</span></h2>
-        <div class="w-bar"><i></i></div>
+        <h2>نورتو كوزمتك <span>رزان روز by ismael</span></h2>
     </div>
     <script>
     (function(){
@@ -1501,7 +1548,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
         var h=w.querySelector('h2');
         function showTitle(){ if(shown) return; shown=true; if(h) h.classList.add('show'); }
         // ننتظر الخط الغليظ حتى يظهر العنوان مرة وحدة بدون تبديل (حد أقصى 2.5 ثانية)
-        try{ document.fonts.load('700 40px Lemonada','نورتو رزان روز by ismael').then(showTitle,showTitle); }catch(e){ showTitle(); }
+        try{ document.fonts.load('700 40px Lemonada','نورتو كوزمتك رزان روز by ismael').then(showTitle,showTitle); }catch(e){ showTitle(); }
         setTimeout(showTitle,2500);
         function close(){
             if(done) return; done=true;
@@ -2423,7 +2470,10 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
             }
  
             const sorted = sortCategories(categories);
-            c.innerHTML = sorted.map((cat) => { if (cat.name === 'الكل') cat = { ...cat, image: DEFAULT_CAT_IMAGES.all || svgAll }; return `
+            c.innerHTML = sorted.map((cat) => { if (cat.name === 'الكل') return `
+                <button type="button" class="cat-btn cat-all-btn flex flex-col items-center" data-cat="${esc(cat.name)}">
+                    <span class="cat-label text-[10px] font-bold leading-4 text-center break-words w-full px-1">${esc(cat.name)}</span>
+                </button>`; return `
                 <button type="button" class="cat-btn flex flex-col items-center min-w-[80px] max-w-[92px] gap-2" data-cat="${esc(cat.name)}">
                     <div class="cat-thumb w-16 h-16 rounded-2xl overflow-hidden shadow-sm bg-blue-100">
                         <img src="${esc(cldUrl(cat.image || svgAll, 160))}" data-orig="${esc(cat.image || svgAll)}" alt="${esc(cat.name)}" width="64" height="64" loading="lazy" decoding="async" class="img-fade w-full h-full object-cover" onload="this.classList.add('loaded')" onerror="imgErr(this,'cat')">
