@@ -1769,7 +1769,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                 <button type="button" onclick="exploreCategories()">تصفحي الأصناف <i class="fa-solid fa-arrow-up mr-1"></i></button>
             </div>
             <div class="text-center mt-6">
-                <button id="load-more-btn" type="button" onclick="loadMoreProducts()" class="hidden px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow">عرض المزيد</button>
+                <button id="load-more-btn" type="button" onclick="retryProducts()" class="hidden px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow">عرض المزيد</button>
             </div>
 
             <div id="no-products-found" class="hidden text-center py-20">
@@ -2745,9 +2745,24 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
             sentinelObserver.observe(s);
         }
 
+        function remoteFailed() {
+            try { const r = remote[currentSelectedCategory]; return !!(r && !r.done && r.fails > 0); }
+            catch (_) { return false; }
+        }
         function updateLoadMore() {
             const b = $('load-more-btn');
-            if (b) b.classList.toggle('hidden', loading || renderedHtml.length >= lastFiltered.length);
+            if (!b) return;
+            const hasLocalMore = renderedHtml.length < lastFiltered.length;
+            const failed = !hasLocalMore && remoteFailed();
+            b.textContent = failed ? 'تعذّر تحميل بقية المنتجات — إعادة المحاولة' : 'عرض المزيد';
+            b.classList.toggle('hidden', loading || !(hasLocalMore || failed));
+        }
+        function retryProducts() {
+            const r = remote[currentSelectedCategory];
+            if (r && !r.done && r.fails > 0) {
+                r.retryAt = 0; clearTimeout(r.timer);
+                fetchProductsPage(currentSelectedCategory, false);
+            } else loadMoreProducts();
         }
 
         function loadMoreProducts() {
@@ -4268,22 +4283,33 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
         let allLoaded = false;
         let allPromise = null;
         const cleanDocs = (snap) => snap.docs.filter((d) => !d.id.startsWith('__')).map((d) => ({ id: d.id, ...d.data() }));
+        const PERMANENT_ERR = ['failed-precondition', 'permission-denied', 'unauthenticated', 'invalid-argument'];
+        const isPermanent = (e) => !!(e && PERMANENT_ERR.includes(e.code));
+        const serverIds = new Set();    // معرفات المنتجات المؤكدة من السيرفر (لتمييزها عن بيانات الكاش القديمة)
         async function readDocs(q) {
+            // قراءة من السيرفر فقط مع محاولة ثانية. لا نقبل نتيجة الكاش أبداً لأنها قد تكون ناقصة/فارغة عند ضعف الشبكة
+            // وكانت تُعتبر "نهاية القائمة" فتتوقف بقية المنتجات عن الظهور.
             try { return await withTimeout(fb.getDocsFromServer(q), 12000); }
-            catch (e) { if (e && e.code === 'failed-precondition') throw e; return await withTimeout(fb.getDocs(q), 12000); }
+            catch (e) {
+                if (isPermanent(e)) throw e;
+                return await withTimeout(fb.getDocsFromServer(q), 15000);
+            }
         }
         function mergeProducts(list) {
             const m = new Map(products.map((p) => [p.id, p]));
-            list.forEach((p) => m.set(p.id, p));
+            list.forEach((p) => { m.set(p.id, p); serverIds.add(p.id); });
             products = [...m.values()];
             rebuildIndex();
             persist('products', products);
         }
         async function fetchProductsPage(cat, first) {
             if (!db || !fb || allLoaded) return;
-            const st = remote[cat] || (remote[cat] = { cursor: null, done: false, busy: false, ordered: true });
+            const st = remote[cat] || (remote[cat] = { cursor: null, done: false, busy: false, ordered: true, fails: 0, retryAt: 0, timer: null });
             if (st.busy || st.done) return;
+            if (Date.now() < st.retryAt) return;   // انتظار قصير قبل إعادة المحاولة بعد فشل الشبكة
             st.busy = true;
+            // أول صفحة لتصنيف "الكل" = المؤشر لسه فارغ (حتى لو هذه محاولة إعادة)
+            const isFirst = cat === 'الكل' ? (first || !st.cursor) : first;
             // لا نظهر هياكل تحميل عند التمرير؛ نضيف المنتجات فور وصولها.
             const n = 8;
             const build = (ordered) => {
@@ -4294,25 +4320,49 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
                 c.push(fb.limit(n));
                 return fb.query(fb.collection(db, 'products'), ...c);
             };
+            let reachedEnd = false;
             try {
                 let snap;
                 try { snap = await readDocs(build(st.ordered)); }
-                catch (e) { if (!st.ordered) throw e; st.ordered = false; snap = await readDocs(build(false)); }
+                catch (e) {
+                    // التحويل للاستعلام غير المرتب فقط إذا كان السبب فهرس ناقص؛ أخطاء الشبكة تُعاد محاولتها ولا تنهي القائمة
+                    if (!st.ordered || !isPermanent(e)) throw e;
+                    st.ordered = false;
+                    st.cursor = null;   // مؤشر الاستعلام المرتب لا يصلح للاستعلام غير المرتب
+                    snap = await readDocs(build(false));
+                }
+                st.fails = 0; st.retryAt = 0;
                 if (snap.docs.length) st.cursor = snap.docs[snap.docs.length - 1];
-                if (snap.docs.length < n) st.done = true;
-                if (first && cat === 'الكل') { products = []; resetOrder(); }   // أول دفعة حقيقية تستبدل الكاش القديم
+                if (snap.docs.length < n) { st.done = true; reachedEnd = true; }
                 const pageProducts = cleanDocs(snap);
+                pageProducts.forEach((p) => serverIds.add(p.id));
+                if (isFirst && cat === 'الكل') {
+                    // أول دفعة حقيقية: نحذف فقط منتجات الكاش القديمة غير المؤكدة من السيرفر،
+                    // ولا نمسح ما وصل فعلاً من السيرفر (كان يسبب ضياع المنتجات عند تزامن البحث مع التحميل).
+                    products = products.filter((p) => serverIds.has(p.id));
+                    resetOrder();
+                }
                 mergeProducts(pageProducts);
                 // عند جلب صفحة إضافية للتصنيف المفتوح، وسّع عدد المنتجات المعروضة
                 // حتى تظهر الدفعة الجديدة فور اكتمال جلبها ولا يعاد طلبها بلا نهاية.
-                if (!first && currentSelectedCategory === cat) {
+                if (!isFirst && currentSelectedCategory === cat) {
                     visibleCount += pageProducts.length;
                 }
             } catch (e) {
-                lastDbError = e; st.done = true;
+                lastDbError = e;
                 console.error('Products page failed:', e);
+                if (isPermanent(e)) {
+                    st.done = true;   // خطأ دائم (صلاحيات...) لا فائدة من التكرار
+                } else {
+                    // خطأ مؤقت (ضعف شبكة/timeout): لا نعتبر القائمة منتهية، نعيد المحاولة تلقائياً بفاصل متزايد
+                    st.fails++;
+                    const delay = Math.min(30000, 1500 * Math.pow(2, st.fails - 1));
+                    st.retryAt = Date.now() + delay;
+                    clearTimeout(st.timer);
+                    if (st.fails <= 6) st.timer = setTimeout(() => fetchProductsPage(cat, first), delay + 50);
+                }
                 // إذا لم يصل أي منتج بعد، احتفظ بالمحتوى الاحتياطي بدلاً من ترك شبكة فارغة.
-                if (first && cat === 'الكل' && products.length === 0 && defaultProducts.length) {
+                if (isFirst && cat === 'الكل' && products.length === 0 && defaultProducts.length) {
                     products = [...defaultProducts];
                     rebuildIndex();
                 }
@@ -4322,6 +4372,9 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
             const wasLoading = loading;
             markReady('products');
             if (!wasLoading) { renderProducts(); if (adminOpen) renderAdminTables(); }
+            // الاستعلام المرتب بـ createdAt يتجاهل أي منتج ما عنده هذا الحقل (منتجات قديمة/مستوردة).
+            // عند نهاية القائمة نسوي قراءة كاملة مرة وحدة بالخلفية حتى تظهر كل المنتجات.
+            if (reachedEnd && st.ordered && !allLoaded) loadAllProducts();
         }
         // تحميل كل المنتجات مرة وحدة: للبحث ولوحة التحكم فقط
         function loadAllProducts(force) {
@@ -4330,6 +4383,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
             if (allPromise) return force ? allPromise.then(() => loadAllProducts(true)) : allPromise;
             allPromise = readDocs(fb.collection(db, 'products')).then((snap) => {
                 products = cleanDocs(snap);
+                products.forEach((p) => serverIds.add(p.id));
                 rebuildIndex();
                 persist('products', products);
                 allLoaded = true;
@@ -4402,7 +4456,7 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
         let hiddenAt = 0;
         function refreshLatestProducts() {
             if (!db || !fb || loading) return;
-            Object.keys(remote).forEach((k) => delete remote[k]);
+            Object.keys(remote).forEach((k) => { clearTimeout(remote[k].timer); delete remote[k]; });
             allLoaded = false;
             fetchProductsPage('الكل', true).then(() => {
                 if (currentSelectedCategory !== 'الكل') fetchProductsPage(currentSelectedCategory, true);
@@ -4415,12 +4469,13 @@ body [class~="hover:bg-stone-800"]:hover, body [class~="hover:bg-stone-700"]:hov
         });
         window.addEventListener('pageshow', (e) => { if (e.persisted) refreshLatestProducts(); });
         window.addEventListener('online', () => {
-            if (db && fb && !loading) {
-                Object.keys(remote).forEach((k) => { if (remote[k].done && !remote[k].cursor) delete remote[k]; });
-                if (!remote['الكل'] || (!remote['الكل'].busy && !remote['الكل'].cursor)) {
-                    fetchProductsPage('الكل', true);
-                }
-            }
+            if (!db || !fb || loading) return;
+            Object.keys(remote).forEach((k) => {
+                const r = remote[k];
+                if (r && !r.done && r.fails > 0) { r.retryAt = 0; fetchProductsPage(k, false); }
+            });
+            if (!remote['الكل']) fetchProductsPage('الكل', true);
+            if (!allLoaded && searchQuery.trim()) loadAllProducts();
         });
 
         // البانر: نوقف حركته لما ينزل الزبون عنه حتى يبقى التمرير سلس
